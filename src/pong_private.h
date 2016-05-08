@@ -41,6 +41,14 @@ extern "C" {
     static int default_player2_w = 20;
     static int default_player2_h = 100;
 
+    enum Ball_State {
+        ball_state_moving,
+        ball_state_hit_wall_left,
+        ball_state_hit_wall_right,
+        ball_state_hit_player,
+        ball_state_total_states
+    };
+
     struct Pong_Ball {
         SDL_Rect coords;
         unsigned int left;
@@ -55,8 +63,12 @@ extern "C" {
     struct Pong_Data {
         struct Pong_Ball *ball;
         struct Pong_Window *window;
+
         SDL_Rect *player1;
         SDL_Rect *player2;
+
+        unsigned int p1_score;
+        unsigned int p2_score;
     };
 
     static struct Pong_Window *init_window(const int window_height, const int window_width);
@@ -64,11 +76,12 @@ extern "C" {
     static SDL_Rect *init_player1();
     static SDL_Rect *init_player2();
     static void handle_keys(struct Pong_Data *pd, const Uint8 *k);
-    static void handle_ball(struct Pong_Data *pd);
+    static enum Ball_State handle_ball(struct Pong_Data *pd);
     static void handle_players(struct Pong_Data *pd);
     static void player_movement(SDL_Rect *player, const int height);
     static bool check_for_collision(SDL_Rect *obj1, SDL_Rect *obj2);
-    static void debug_print_rect(SDL_Rect *r);
+    static void handle_scores(struct Pong_Data *pd, enum Ball_State);
+    //static void debug_print_rect(SDL_Rect *r);
 
     struct Pong_Window * init_window(const int window_height, const int window_width) {
         //http://stackoverflow.com/questions/9691404/how-to-initialize-const-in-a-struct-in-c-with-malloc
@@ -142,19 +155,17 @@ extern "C" {
         }
     }
 
-    void handle_ball(struct Pong_Data *pd) {
+    enum Ball_State handle_ball(struct Pong_Data *pd) {
         int speed = ball_speed;
+        enum Ball_State bstate = ball_state_moving;
 
         //moving to the right
         if (pd->ball->left == 0) {
             if (!check_for_collision(&(pd->ball->coords), pd->player2)) {
                 pd->ball->coords.x += speed;
             } else {
-                debug_print_rect(&(pd->ball->coords));
-                debug_print_rect(pd->player2);
-                printf("Entrei aqui1111111!\n");
                 pd->ball->left = 1;
-                sleep(10);
+                bstate = ball_state_hit_player;
             }
         } else {
             //moving to the left
@@ -162,6 +173,7 @@ extern "C" {
                 pd->ball->coords.x -= speed;
             } else {
                 pd->ball->left = 0;
+                bstate = ball_state_hit_player;
             }
         }
 
@@ -171,11 +183,13 @@ extern "C" {
             pd->ball->coords.y -= speed;
         }
 
+        //Hit the wall!!!
         if (pd->ball->coords.x <= 0) {
             pd->ball->left = 0;
+            bstate = ball_state_hit_wall_left;
         } else if (pd->ball->coords.x + pd->ball->coords.w >= pd->window->width) {
-
             pd->ball->left = 1;
+            bstate = ball_state_hit_wall_right;
         }
 
         if (pd->ball->coords.y <= 0) {
@@ -183,6 +197,8 @@ extern "C" {
         } else if (pd->ball->coords.y + pd->ball->coords.h >= pd->window->height) {
             pd->ball->up = 1;
         }
+
+        return bstate;
     }
 
     void handle_players(struct Pong_Data *pd) {
@@ -231,10 +247,25 @@ extern "C" {
         return true;
     }
 
-    void debug_print_rect(SDL_Rect *r) {
-        printf("x: %d, y: %d, w: %d, h: %d\n", r->x, r->y, r->w, r->h);
+    void handle_scores(struct Pong_Data *pd, enum Ball_State bstate) {
+        switch (bstate) {
+            case ball_state_hit_wall_right:
+                pd->p1_score++;
+                printf("\n-- Scores --\nPlayer 1: %u\nPlayer 2: %u", pd->p1_score, pd->p2_score);
+                break;
+            case ball_state_hit_wall_left:
+                pd->p2_score++;
+                printf("\n-- Scores --\nPlayer 1: %u\nPlayer 2: %u", pd->p1_score, pd->p2_score);
+                break;
+            default:
+                ;
+        }
     }
-
+    /*
+        void debug_print_rect(SDL_Rect *r) {
+            printf("x: %d, y: %d, w: %d, h: %d\n", r->x, r->y, r->w, r->h);
+        }
+    //*/
 #ifdef __cplusplus
 }
 #endif
