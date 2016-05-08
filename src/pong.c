@@ -24,6 +24,10 @@ void Pong_Handle(const Uint8 *keys) {
 }
 
 void Pong_Draw(SDL_Renderer *gRenderer) {
+    //Clear screen
+    SDL_SetRenderDrawColor(gRenderer, 255, 255, 255, 0xFF);
+    SDL_RenderClear(gRenderer);
+
     //Draw Players
     SDL_SetRenderDrawColor(gRenderer, 0, 0, 0, 0xFF);
     SDL_RenderDrawRect(gRenderer, p_data->player1);
