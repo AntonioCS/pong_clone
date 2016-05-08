@@ -36,7 +36,7 @@ int main(int argc, char* args[]) {
         window = SDL_CreateWindow("Pong", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, SCREEN_WIDTH, SCREEN_HEIGHT, SDL_WINDOW_SHOWN);
         SDL_Renderer *gRenderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
 
-        Pong_Init(SCREEN_HEIGHT, SCREEN_HEIGHT);
+        Pong_Init(SCREEN_HEIGHT, SCREEN_WIDTH);
 
         //Main loop flag
         bool quit = false;
