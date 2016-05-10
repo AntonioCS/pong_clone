@@ -14,7 +14,7 @@ int main(int argc, char* args[]) {
     SDL_Window* window = NULL;
 
     //Initialize SDL
-    if (SDL_Init(SDL_INIT_VIDEO) == 0) {
+    if (SDL_Init(SDL_INIT_VIDEO) == 0 && TTF_Init() == 0) {
         //SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "1");
         window = SDL_CreateWindow("Pong", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, SCREEN_WIDTH, SCREEN_HEIGHT, SDL_WINDOW_SHOWN);
         SDL_Renderer *gRenderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
@@ -59,14 +59,15 @@ int main(int argc, char* args[]) {
             SDL_RenderPresent(gRenderer);
         }
 
+        SDL_DestroyRenderer(gRenderer);
     } else {
-        printf("Did not enter\n");
+        printf("Unable to initialize SDL2\n");
     }
 
-    //Destroy window
     SDL_DestroyWindow(window);
 
     //Quit SDL subsystems
+    TTF_Quit();
     SDL_Quit();
 
     return 0;
