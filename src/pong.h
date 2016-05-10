@@ -13,11 +13,12 @@ extern "C" {
 #endif
 
 #include <SDL.h>
+#include <SDL_ttf.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdbool.h>
 #include <string.h>
-    
+
     void Pong_Init(const int window_height, const int window_width);
     void Pong_Handle(const Uint8 *);
     void Pong_Draw(SDL_Renderer *gRenderer);
