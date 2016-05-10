@@ -1,8 +1,9 @@
 BIN=pong
-TARGET=./build/$(BIN)
+BUILD_DIR=./build
+TARGET=$(BUILD_DIR)/$(BIN)
 CFLAGS=-std=c11 -Wall -Werror -g
 LDFLAGS=
-LDLIBS=`pkg-config --libs --cflags sdl2`
+LDLIBS=`pkg-config --libs --cflags sdl2 SDL2_ttf`
 CC=gcc
 SRC_DIR=./src
 SRC=$(wildcard $(SRC_DIR)/*.c)
@@ -20,6 +21,10 @@ all: $(TARGET)
 $(TARGET): $(OBJ)
 	$(dir_guard)
 	$(CC) $(CFLAGS) $(LDFLAGS) -o $@ $^ $(LDLIBS)
+#copy all the resources to the build dir so that the
+#executable can access everything in ./resources/<RESOURCE>
+#added the @ to suppress the echoing
+	@cp -n -R ./resources $(BUILD_DIR)/resources
 
 #To cause recompile when .h files are change
 $(OBJ):	$(SRC) $(HEADERS)
