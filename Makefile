@@ -30,7 +30,8 @@ $(TARGET): $(OBJ)
 $(OBJ):	$(SRC) $(HEADERS)
 	$(dir_guard)
 	$(CC) $(CFLAGS) -c $(SRC) $(LDLIBS)
-	mv *.o $(OBJ_DIR)
+#Put all the object files in the correct directory
+	@mv *.o $(OBJ_DIR)
 
 clean:
 	rm -rf $(TARGET) ./src/obj/*
