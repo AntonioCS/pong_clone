@@ -100,6 +100,5 @@ void Game_Font_Destroy(struct Game_Font *gf) {
         gf->colour = NULL;
 
         free(gf);
-        gf = NULL;
     }
 }
