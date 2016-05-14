@@ -1,18 +1,3 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
-
-/* 
- * File:   fonts.h
- * Author: António Simões <antoniocs@gmail.com>
- *
- * Created on 12 May 2016, 18:50
- */
-
-#ifndef FONTS_H
-#define FONTS_H
 
 #include <SDL.h>
 #include <SDL_ttf.h>
@@ -20,6 +5,9 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdbool.h>
+
+#ifndef FONTS_H
+#define FONTS_H
 
 #ifdef __cplusplus
 extern "C" {
