@@ -53,5 +53,24 @@ void Pong_Draw(SDL_Renderer *gRenderer) {
 }
 
 void Pong_Destroy() {
+    free(p_data->window);
+    p_data->window = NULL;
 
+    free(p_data->ball);
+    p_data->ball = NULL;
+
+    free(p_data->player1);
+    p_data->player1 = NULL;
+
+    free(p_data->player2);
+    p_data->player2 = NULL;
+
+    Game_Font_Destroy(gf_p1_score);
+    gf_p1_score = NULL;
+
+    Game_Font_Destroy(gf_p2_score);
+    gf_p2_score = NULL;
+
+    free(p_data);
+    p_data = NULL;
 }
