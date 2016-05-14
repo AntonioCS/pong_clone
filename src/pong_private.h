@@ -1,15 +1,3 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
-
-/* 
- * File:   pong_private.h
- * Author: António Simões <antoniocs@gmail.com>
- *
- * Created on 08 May 2016, 08:20
- */
 #include <SDL.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -22,24 +10,6 @@
 #ifdef __cplusplus
 extern "C" {
 #endif  
-
-    static int ball_speed = 2;
-    static int player_speed = 10;
-
-    static int default_ball_x = 120;
-    static int default_ball_y = 30;
-    static int default_ball_w = 20;
-    static int default_ball_h = 20;
-
-    static int default_player1_x = 20;
-    static int default_player1_y = 30;
-    static int default_player1_w = 20;
-    static int default_player1_h = 100;
-
-    static int default_player2_x = 600;
-    static int default_player2_y = 30;
-    static int default_player2_w = 20;
-    static int default_player2_h = 100;
 
     enum Ball_State {
         ball_state_moving,
@@ -70,6 +40,42 @@ extern "C" {
         unsigned int p1_score;
         unsigned int p2_score;
     };
+
+    struct Pong_Data *p_data;
+
+    struct Game_Font *gf_p1_score;
+    struct Game_Font *gf_p2_score;
+
+    SDL_Rect p1_score_dest = {
+        .x = 120,
+        .y = 20,
+        .w = 150,
+        .h = 120
+    };
+    SDL_Rect p2_score_dest = {
+        .x = 420,
+        .y = 20,
+        .w = 150,
+        .h = 120
+    };
+
+    static int ball_speed = 2;
+    static int player_speed = 10;
+
+    static int default_ball_x = 120;
+    static int default_ball_y = 30;
+    static int default_ball_w = 20;
+    static int default_ball_h = 20;
+
+    static int default_player1_x = 20;
+    static int default_player1_y = 30;
+    static int default_player1_w = 20;
+    static int default_player1_h = 100;
+
+    static int default_player2_x = 600;
+    static int default_player2_y = 30;
+    static int default_player2_w = 20;
+    static int default_player2_h = 100;
 
     static struct Pong_Window *init_window(const int window_height, const int window_width);
     static struct Pong_Ball *init_ball();
@@ -251,11 +257,11 @@ extern "C" {
         switch (bstate) {
             case ball_state_hit_wall_right:
                 pd->p1_score++;
-                printf("\n-- Scores --\nPlayer 1: %u\nPlayer 2: %u", pd->p1_score, pd->p2_score);
+                //printf("\n-- Scores --\nPlayer 1: %u\nPlayer 2: %u", pd->p1_score, pd->p2_score);
                 break;
             case ball_state_hit_wall_left:
                 pd->p2_score++;
-                printf("\n-- Scores --\nPlayer 1: %u\nPlayer 2: %u", pd->p1_score, pd->p2_score);
+                //printf("\n-- Scores --\nPlayer 1: %u\nPlayer 2: %u", pd->p1_score, pd->p2_score);
                 break;
             default:
                 ;
