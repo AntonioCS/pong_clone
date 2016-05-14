@@ -1,12 +1,6 @@
 #include "pong.h"
+#include "fonts.h"
 #include "pong_private.h"
-
-struct Pong_Data *p_data;
-
-static SDL_Color color;
-static TTF_Font *font;
-static SDL_Surface *font_text;
-static SDL_Texture *mTexture;
 
 void Pong_Init(const int window_height, const int window_width) {
     p_data = malloc(sizeof (struct Pong_Data));
@@ -20,17 +14,8 @@ void Pong_Init(const int window_height, const int window_width) {
     p_data->p1_score = 0;
     p_data->p2_score = 0;
 
-    font = TTF_OpenFont("./resources/font/lazy.ttf", 78);
-    color.r = 0;
-    color.g = 0;
-    color.b = 0;
-
-    if (font == NULL) {
-        printf("Failed to load lazy font! SDL_ttf Error: %s\n", TTF_GetError());
-    }
-
-    font_text = TTF_RenderText_Blended(font, "01", color);
-    //font_text = TTF_RenderText_Solid(font, "01", color);
+    gf_p1_score = Game_Font_Init("./resources/font/lazy.ttf", 78);
+    gf_p2_score = Game_Font_Init("./resources/font/lazy.ttf", 78);
 }
 
 void Pong_Handle(const Uint8 *keys) {
@@ -41,13 +26,14 @@ void Pong_Handle(const Uint8 *keys) {
 }
 
 void Pong_Draw(SDL_Renderer *gRenderer) {
-    SDL_Rect test_struct = {
-        .x = 120,
-        .y = 20,
-        .w = 150,
-        .h = 120
-    };
-    mTexture = SDL_CreateTextureFromSurface( gRenderer, font_text);
+    char score_p1[4] = {0};
+    char score_p2[4] = {0};
+
+    snprintf(score_p1, 4, "%d", p_data->p1_score);
+    snprintf(score_p2, 4, "%d", p_data->p2_score);
+
+    Game_Font_SetText(gf_p1_score, score_p1);
+    Game_Font_SetText(gf_p2_score, score_p2);
 
     //Clear screen
     SDL_SetRenderDrawColor(gRenderer, 255, 255, 255, 0xFF);
@@ -61,6 +47,11 @@ void Pong_Draw(SDL_Renderer *gRenderer) {
     //Draw "ball"
     SDL_RenderDrawRect(gRenderer, &(p_data->ball->coords));
 
-    //Draw TExt
-    SDL_RenderCopy(gRenderer, mTexture, NULL, &test_struct);
+    //Draw Text
+    Game_Font_Write(gf_p1_score, gRenderer, &p1_score_dest);
+    Game_Font_Write(gf_p2_score, gRenderer, &p2_score_dest);
+}
+
+void Pong_Destroy() {
+
 }
