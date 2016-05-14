@@ -1,4 +1,3 @@
-
 #include "fonts.h"
 
 struct Game_Font {
@@ -96,7 +95,7 @@ void Game_Font_Destroy(struct Game_Font *gf) {
     if (gf) {
         TTF_CloseFont(gf->font);
         gf->font = NULL;
-        
+
         free(gf->colour);
         gf->colour = NULL;
 
