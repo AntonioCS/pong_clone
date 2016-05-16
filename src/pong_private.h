@@ -26,8 +26,10 @@ extern "C" {
     };
 
     struct Pong_Window {
-        const int height;
-        const int width;
+        const int x;
+        const int y;
+        const int h;
+        const int w;
     };
 
     struct Pong_Data {
@@ -62,22 +64,38 @@ extern "C" {
     static int ball_speed = 2;
     static int player_speed = 10;
 
+    //<editor-fold defaultstate="collapsed" desc="Default values">
     static int default_ball_x = 120;
     static int default_ball_y = 30;
     static int default_ball_w = 20;
     static int default_ball_h = 20;
 
-    static int default_player1_x = 20;
-    static int default_player1_y = 30;
+    static int default_player1_x;
+    static int default_player1_y;
     static int default_player1_w = 20;
     static int default_player1_h = 100;
 
-    static int default_player2_x = 600;
-    static int default_player2_y = 30;
+    static int default_player2_x;
+    static int default_player2_y;
     static int default_player2_w = 20;
     static int default_player2_h = 100;
 
-    static struct Pong_Window *init_window(const int window_height, const int window_width);
+    static int default_score_p1_x;
+    static int default_score_p1_y;
+    static int default_score_p1_w = 150;
+    //static int default_score_p1_h = 120;
+
+    static int default_score_p2_x;
+    static int default_score_p2_y;
+    static int default_score_p2_w = 150;
+    //static int default_score_p2_h = 120;
+    //</editor-fold>
+
+    static int center;
+    static int center_half_left;
+    static int center_half_right;
+
+    static struct Pong_Window *init_window(const int window_x, const int window_y, const int window_height, const int window_width);
     static struct Pong_Ball *init_ball();
     static SDL_Rect *init_player1();
     static SDL_Rect *init_player2();
@@ -87,13 +105,16 @@ extern "C" {
     static void player_movement(SDL_Rect *player, const int height);
     static bool check_for_collision(SDL_Rect *obj1, SDL_Rect *obj2);
     static void handle_scores(struct Pong_Data *pd, enum Ball_State);
+    static void calculate_defaults(struct Pong_Data *pd);
     //static void debug_print_rect(SDL_Rect *r);
 
-    struct Pong_Window * init_window(const int window_height, const int window_width) {
+    struct Pong_Window *init_window(const int window_x, const int window_y, const int window_height, const int window_width) {
         //http://stackoverflow.com/questions/9691404/how-to-initialize-const-in-a-struct-in-c-with-malloc
         struct Pong_Window p_window = {
-            .height = window_height,
-            .width = window_width
+            .x = window_x,
+            .y = window_y,
+            .h = window_height,
+            .w = window_width
         };
 
         struct Pong_Window *pw = malloc(sizeof (struct Pong_Window));
@@ -193,14 +214,14 @@ extern "C" {
         if (pd->ball->coords.x <= 0) {
             pd->ball->left = 0;
             bstate = ball_state_hit_wall_left;
-        } else if (pd->ball->coords.x + pd->ball->coords.w >= pd->window->width) {
+        } else if (pd->ball->coords.x + pd->ball->coords.w >= pd->window->w) {
             pd->ball->left = 1;
             bstate = ball_state_hit_wall_right;
         }
 
         if (pd->ball->coords.y <= 0) {
             pd->ball->up = 0;
-        } else if (pd->ball->coords.y + pd->ball->coords.h >= pd->window->height) {
+        } else if (pd->ball->coords.y + pd->ball->coords.h >= pd->window->h) {
             pd->ball->up = 1;
         }
 
@@ -208,8 +229,8 @@ extern "C" {
     }
 
     void handle_players(struct Pong_Data *pd) {
-        player_movement(pd->player1, pd->window->height);
-        player_movement(pd->player2, pd->window->height);
+        player_movement(pd->player1, pd->window->h);
+        player_movement(pd->player2, pd->window->h);
     }
 
     void player_movement(SDL_Rect *player, const int height) {
@@ -267,11 +288,48 @@ extern "C" {
                 ;
         }
     }
+
     /*
         void debug_print_rect(SDL_Rect *r) {
             printf("x: %d, y: %d, w: %d, h: %d\n", r->x, r->y, r->w, r->h);
         }
     //*/
+
+
+    void calculate_defaults(struct Pong_Data *pd) {
+        if (pd->window) {
+            int margin_side_space = 20;
+            int margin_top_space = 30;
+
+            //left side player
+            default_player1_x = pd->window->x + margin_side_space;
+            default_player1_y = pd->window->y + margin_top_space;
+
+            //right side player
+            default_player2_x = pd->window->w - margin_side_space - default_player2_w;
+
+            printf("Default_player_2: %d\n", default_player2_x);
+            default_player2_y = default_player1_y;
+
+            center = pd->window->w / 2;
+            center_half_left = pd->window->w / 4;
+            center_half_right = center + center_half_left;
+
+            printf("Center: %d --- center half left: %d --- center half right: %d\n", center, center_half_left, center_half_right);
+
+            default_score_p1_x = center_half_left - (default_score_p1_w / 2);
+            default_score_p1_y = margin_top_space;
+
+            default_score_p2_x = center_half_right - (default_score_p2_w / 2);
+            default_score_p2_y = margin_top_space;
+
+            p1_score_dest.x = default_score_p1_x;
+            p1_score_dest.y = default_score_p1_y;
+
+            p2_score_dest.x = default_score_p2_x;
+            p2_score_dest.y = default_score_p2_y;
+        }
+    }
 #ifdef __cplusplus
 }
 #endif
