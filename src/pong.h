@@ -11,7 +11,7 @@ extern "C" {
 #include <stdbool.h>
 #include <string.h>
 
-    void Pong_Init(const int window_height, const int window_width);
+    void Pong_Init(const int start_x, const int start_y, const int window_height, const int window_width);
     void Pong_Handle(const Uint8 *);
     void Pong_Draw(SDL_Renderer *gRenderer);
     void Pong_Destroy();
