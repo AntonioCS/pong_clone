@@ -2,10 +2,12 @@
 #include "fonts.h"
 #include "pong_private.h"
 
-void Pong_Init(const int window_height, const int window_width) {
+void Pong_Init(const int start_x, const int start_y, const int window_height, const int window_width) {
     p_data = malloc(sizeof (struct Pong_Data));
 
-    p_data->window = init_window(window_height, window_width);
+    p_data->window = init_window(start_x, start_y, window_height, window_width);
+    calculate_defaults(p_data);
+
     p_data->ball = init_ball();
 
     p_data->player1 = init_player1();
@@ -50,6 +52,14 @@ void Pong_Draw(SDL_Renderer *gRenderer) {
     //Draw Text
     Game_Font_Write(gf_p1_score, gRenderer, &p1_score_dest);
     Game_Font_Write(gf_p2_score, gRenderer, &p2_score_dest);
+
+    //Debug lines
+    SDL_SetRenderDrawColor(gRenderer, 255, 0, 0, 0xFF);
+    SDL_RenderDrawLine(gRenderer, center, 0, center, p_data->window->h);
+    SDL_RenderDrawLine(gRenderer, center_half_left, 0, center_half_left, p_data->window->h);
+    SDL_RenderDrawLine(gRenderer, center_half_right, 0, center_half_right, p_data->window->h);
+    SDL_RenderDrawRect(gRenderer, &p1_score_dest);
+    SDL_RenderDrawRect(gRenderer, &p2_score_dest);
 }
 
 void Pong_Destroy() {
