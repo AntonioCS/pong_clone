@@ -68,6 +68,7 @@ int main(int argc, char* args[]) {
 
     SDL_DestroyWindow(window);
 
+    Pong_Destroy();
     //Quit SDL subsystems
     TTF_Quit();
     SDL_Quit();

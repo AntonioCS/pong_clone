@@ -133,6 +133,5 @@ void Game_Font_Destroy(struct Game_Font * gf) {
         check_for_allocated_text(gf);
 
         free(gf);
-        gf = NULL;
     }
 }
