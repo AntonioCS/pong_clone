@@ -57,10 +57,11 @@ extern "C" {
     static int default_margin_top_space = 30;
     static int default_font_margin_top_space = 80;
 
-    static int default_ball_x = 120;
-    static int default_ball_y = 30;
-    static int default_ball_w = 20;
-    static int default_ball_h = 20;
+    static int default_ball_percentage = 4;
+    static int default_ball_x;
+    static int default_ball_y;
+    static int default_ball_w;
+    static int default_ball_h;
 
     static int default_player1_x;
     static int default_player1_y;
@@ -93,6 +94,7 @@ extern "C" {
     static bool check_for_collision(SDL_Rect *obj1, SDL_Rect *obj2);
     static void handle_scores(struct Pong_Data *pd, enum Ball_State);
     static void calculate_defaults(struct Pong_Data *pd);
+    static int inline get_percentage_value(int value, int percentage);
 
     struct Pong_Window *init_window(const int window_x, const int window_y, const int window_height, const int window_width) {
         //http://stackoverflow.com/questions/9691404/how-to-initialize-const-in-a-struct-in-c-with-malloc
@@ -284,8 +286,8 @@ error:
 
     void calculate_defaults(struct Pong_Data *pd) {
         if (pd->window) {
-            default_font_score_size = (float) pd->window->h * (float) default_font_score_size_percentage / 100;
-            int paddles_h = (float) pd->window->h * (float) default_paddles_percentage / 100;
+            default_font_score_size = get_percentage_value(pd->window->h, default_font_score_size_percentage);
+            int paddles_h = get_percentage_value(pd->window->h, default_paddles_percentage);
 
             default_player1_h = paddles_h;
             default_player2_h = paddles_h;
@@ -296,13 +298,23 @@ error:
 
             //right side player
             default_player2_x = pd->window->w - default_margin_side_space - default_player2_w;
-
             default_player2_y = default_player1_y;
 
+            //centers
             center = pd->window->w / 2;
             center_half_left = pd->window->w / 4;
             center_half_right = center + center_half_left;
+
+            //ball
+            default_ball_x = 120;
+            default_ball_y = 30;
+
+            default_ball_w = default_ball_h = get_percentage_value(pd->window->w, default_ball_percentage);
         }
+    }
+
+    int get_percentage_value(int value, int percentage) {
+        return (float) value * (float) percentage / 100;
     }
 
 #ifdef __cplusplus
