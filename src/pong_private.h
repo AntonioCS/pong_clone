@@ -3,8 +3,7 @@
 #include <stdlib.h>
 #include <stdbool.h>
 #include <unistd.h>
-
-#include "dbg.h" //sleep
+#include "dbg.h"
 
 #ifndef PONG_PRIVATE_H
 #define PONG_PRIVATE_H
