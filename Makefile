@@ -1,7 +1,7 @@
 BIN=pong
 BUILD_DIR=./build
 TARGET=$(BUILD_DIR)/$(BIN)
-CFLAGS=-std=c11 -Wall -Werror -g
+CFLAGS=-std=c11 -Wall -Werror -g -O0
 LDFLAGS=
 LDLIBS=`pkg-config --libs --cflags sdl2 SDL2_ttf`
 CC=gcc
@@ -14,7 +14,7 @@ OBJ=$(subst ./src,$(OBJ_DIR), $(patsubst %.c, %.o, $(SRC)))
 #http://stackoverflow.com/a/1951111/8715
 dir_guard=@mkdir -p $(@D)
 
-.PHONY: all clean
+.PHONY: clean
 
 all: $(TARGET)
 

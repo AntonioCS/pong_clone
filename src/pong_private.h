@@ -89,7 +89,7 @@ extern "C" {
     static void handle_scores(struct Pong_Data *pd, enum Ball_State);
     //static void debug_print_rect(SDL_Rect *r);
 
-    struct Pong_Window * init_window(const int window_height, const int window_width) {
+    struct Pong_Window *init_window(const int window_height, const int window_width) {
         //http://stackoverflow.com/questions/9691404/how-to-initialize-const-in-a-struct-in-c-with-malloc
         struct Pong_Window p_window = {
             .height = window_height,
