@@ -2,7 +2,9 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdbool.h>
-#include <unistd.h> //sleep
+#include <unistd.h>
+
+#include "dbg.h" //sleep
 
 #ifndef PONG_PRIVATE_H
 #define PONG_PRIVATE_H
@@ -48,23 +50,14 @@ extern "C" {
     struct Game_Font *gf_p1_score;
     struct Game_Font *gf_p2_score;
 
-    SDL_Rect p1_score_dest = {
-        .x = 120,
-        .y = 20,
-        .w = 150,
-        .h = 120
-    };
-    SDL_Rect p2_score_dest = {
-        .x = 420,
-        .y = 20,
-        .w = 150,
-        .h = 120
-    };
-
     static int ball_speed = 2;
     static int player_speed = 10;
 
     //<editor-fold defaultstate="collapsed" desc="Default values">
+    static int default_margin_side_space = 20;
+    static int default_margin_top_space = 30;
+    static int default_font_margin_top_space = 80;
+
     static int default_ball_x = 120;
     static int default_ball_y = 30;
     static int default_ball_w = 20;
@@ -80,15 +73,10 @@ extern "C" {
     static int default_player2_w = 20;
     static int default_player2_h = 100;
 
-    static int default_score_p1_x;
-    static int default_score_p1_y;
-    static int default_score_p1_w = 150;
-    //static int default_score_p1_h = 120;
+    static int default_paddles_percentage = 25;
 
-    static int default_score_p2_x;
-    static int default_score_p2_y;
-    static int default_score_p2_w = 150;
-    //static int default_score_p2_h = 120;
+    static int default_font_score_size_percentage = 18;
+    static int default_font_score_size;
     //</editor-fold>
 
     static int center;
@@ -106,7 +94,6 @@ extern "C" {
     static bool check_for_collision(SDL_Rect *obj1, SDL_Rect *obj2);
     static void handle_scores(struct Pong_Data *pd, enum Ball_State);
     static void calculate_defaults(struct Pong_Data *pd);
-    //static void debug_print_rect(SDL_Rect *r);
 
     struct Pong_Window *init_window(const int window_x, const int window_y, const int window_height, const int window_width) {
         //http://stackoverflow.com/questions/9691404/how-to-initialize-const-in-a-struct-in-c-with-malloc
@@ -134,13 +121,17 @@ extern "C" {
         };
 
         struct Pong_Ball *pb = malloc(sizeof (struct Pong_Ball));
+        check_mem(pb);
         memcpy(pb, &ball, sizeof (struct Pong_Ball));
 
         return pb;
+error:
+        return NULL;
     }
 
     SDL_Rect *init_player1() {
         SDL_Rect *p = malloc(sizeof (SDL_Rect));
+        check_mem(p);
 
         p->x = default_player1_x;
         p->y = default_player1_y;
@@ -148,10 +139,13 @@ extern "C" {
         p->h = default_player1_h;
 
         return p;
+error:
+        return NULL;
     }
 
     SDL_Rect *init_player2() {
         SDL_Rect *p = malloc(sizeof (SDL_Rect));
+        check_mem(p);
 
         p->x = default_player2_x;
         p->y = default_player2_y;
@@ -159,6 +153,8 @@ extern "C" {
         p->h = default_player2_h;
 
         return p;
+error:
+        return NULL;
     }
 
     void handle_keys(struct Pong_Data *pd, const Uint8 * key_states) {
@@ -278,58 +274,38 @@ extern "C" {
         switch (bstate) {
             case ball_state_hit_wall_right:
                 pd->p1_score++;
-                //printf("\n-- Scores --\nPlayer 1: %u\nPlayer 2: %u", pd->p1_score, pd->p2_score);
                 break;
             case ball_state_hit_wall_left:
                 pd->p2_score++;
-                //printf("\n-- Scores --\nPlayer 1: %u\nPlayer 2: %u", pd->p1_score, pd->p2_score);
                 break;
             default:
                 ;
         }
     }
 
-    /*
-        void debug_print_rect(SDL_Rect *r) {
-            printf("x: %d, y: %d, w: %d, h: %d\n", r->x, r->y, r->w, r->h);
-        }
-    //*/
-
-
     void calculate_defaults(struct Pong_Data *pd) {
         if (pd->window) {
-            int margin_side_space = 20;
-            int margin_top_space = 30;
+            default_font_score_size = (float) pd->window->h * (float) default_font_score_size_percentage / 100;
+            int paddles_h = (float) pd->window->h * (float) default_paddles_percentage / 100;
+
+            default_player1_h = paddles_h;
+            default_player2_h = paddles_h;
 
             //left side player
-            default_player1_x = pd->window->x + margin_side_space;
-            default_player1_y = pd->window->y + margin_top_space;
+            default_player1_x = pd->window->x + default_margin_side_space;
+            default_player1_y = pd->window->y + default_margin_top_space;
 
             //right side player
-            default_player2_x = pd->window->w - margin_side_space - default_player2_w;
+            default_player2_x = pd->window->w - default_margin_side_space - default_player2_w;
 
-            printf("Default_player_2: %d\n", default_player2_x);
             default_player2_y = default_player1_y;
 
             center = pd->window->w / 2;
             center_half_left = pd->window->w / 4;
             center_half_right = center + center_half_left;
-
-            printf("Center: %d --- center half left: %d --- center half right: %d\n", center, center_half_left, center_half_right);
-
-            default_score_p1_x = center_half_left - (default_score_p1_w / 2);
-            default_score_p1_y = margin_top_space;
-
-            default_score_p2_x = center_half_right - (default_score_p2_w / 2);
-            default_score_p2_y = margin_top_space;
-
-            p1_score_dest.x = default_score_p1_x;
-            p1_score_dest.y = default_score_p1_y;
-
-            p2_score_dest.x = default_score_p2_x;
-            p2_score_dest.y = default_score_p2_y;
         }
     }
+
 #ifdef __cplusplus
 }
 #endif
