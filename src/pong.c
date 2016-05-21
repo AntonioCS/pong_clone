@@ -13,11 +13,12 @@ void Pong_Init(const int start_x, const int start_y, const int window_height, co
     p_data->player1 = init_player1();
     p_data->player2 = init_player2();
 
-    p_data->p1_score = 10;
+    p_data->p1_score = 0;
     p_data->p2_score = 0;
 
-    gf_p1_score = Game_Font_Init("./resources/font/press-start/prstart.ttf", default_font_score_size);
-    gf_p2_score = Game_Font_Init("./resources/font/press-start/prstart.ttf", default_font_score_size);
+    char *pong_score_font_path = "./resources/font/press-start/prstart.ttf";
+    gf_p1_score = Game_Font_Init(pong_score_font_path, default_font_score_size);
+    gf_p2_score = Game_Font_Init(pong_score_font_path, default_font_score_size);
 }
 
 void Pong_Handle(const Uint8 *keys) {
@@ -48,7 +49,7 @@ void Pong_Draw(SDL_Renderer *gRenderer) {
     Game_Font_WriteCentered(gf_p2_score, gRenderer, center_half_right, default_font_margin_top_space);
 
     //Debug lines
-    ///*
+    /*
     SDL_SetRenderDrawColor(gRenderer, 255, 0, 0, 0xFF);
     SDL_RenderDrawLine(gRenderer, center, 0, center, p_data->window->h);
     SDL_RenderDrawLine(gRenderer, center_half_left, 0, center_half_left, p_data->window->h);
