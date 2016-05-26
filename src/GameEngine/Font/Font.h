@@ -29,8 +29,8 @@ extern "C" {
 
     struct GameEngine_Font *GameEngine_Font_Init(SDL_Renderer *, char *, int);
 
-#define GameEngine_Font_Destroy(...) GameEngine_Font_DestroyBase((struct GameEngine_Font *[]){__VA_ARGS__, NULL});
-    void GameEngine_Font_DestroyBase(struct GameEngine_Font **);
+#define GameEngine_Font_Destroy(...) GameEngine_Font_DestroyBase((struct GameEngine_Font **[]){__VA_ARGS__, NULL});
+    void GameEngine_Font_DestroyBase(struct GameEngine_Font ***);
 
 #ifdef __cplusplus
 }

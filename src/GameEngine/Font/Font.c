@@ -37,8 +37,10 @@ error:
     return NULL;
 }
 
-void GameEngine_Font_DestroyBase(struct GameEngine_Font **list) {
+void GameEngine_Font_DestroyBase(struct GameEngine_Font ***list) {
     while (*list != NULL) {
-        destroy(*list++);
+        destroy(**list);
+        **list = NULL;
+        list++;
     }
 }
