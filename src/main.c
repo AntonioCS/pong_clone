@@ -10,29 +10,21 @@ int main(int argc, char* args[]) {
     const int SCREEN_WIDTH = 640;
     const int SCREEN_HEIGHT = 480;
 
-    const Uint8 *key_states;
-
     SDL_Window* window = NULL;
 
     //Initialize SDL
     if (SDL_Init(SDL_INIT_VIDEO) == 0 && TTF_Init() == 0) {
-        //SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "1");
+        SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "1");
         window = SDL_CreateWindow("Pong", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, SCREEN_WIDTH, SCREEN_HEIGHT, SDL_WINDOW_SHOWN);
         SDL_Renderer *gRenderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
-
-        Pong_Init(0, 0, SCREEN_HEIGHT, SCREEN_WIDTH);
-
-        //Main loop flag
         bool quit = false;
-
-        //Event handler
+        bool paused = false;
         SDL_Event e;
 
-        bool paused = false;
+        Pong_Init(0, 0, SCREEN_HEIGHT, SCREEN_WIDTH);
+        Pong_SetRenderer(gRenderer);
 
-        //While application is running
         while (!quit) {
-            //Handle events on queue
             while (SDL_PollEvent(&e) != 0) {
                 //User requests quit
                 if (e.type == SDL_QUIT) {
@@ -51,9 +43,7 @@ int main(int argc, char* args[]) {
             }
 
             if (paused == false) {
-                key_states = SDL_GetKeyboardState(NULL);
-
-                Pong_Handle(key_states);
+                Pong_Handle(SDL_GetKeyboardState(NULL));
                 Pong_Draw(gRenderer);
             }
 
