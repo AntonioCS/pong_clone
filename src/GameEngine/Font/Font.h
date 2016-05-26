@@ -5,7 +5,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdbool.h>
-#include "dbg.h"
+#include "../dbg.h"
 
 #ifndef FONTS_H
 #define FONTS_H
@@ -14,16 +14,23 @@
 extern "C" {
 #endif
 
-    struct Game_Font;
+    struct GameEngine_Font_Data;
 
-    struct Game_Font *Game_Font_Init(char *fpath, int size);
-    //void Game_Font_SetSize(struct Game_Font *gf, int size);
-    bool Game_Font_SetText(struct Game_Font *gf, char *);
-    bool Game_Font_SetTextInt(struct Game_Font *gf, int num);
-    void Game_Font_SetColour(struct Game_Font *gf, Uint8 r, Uint8 g, Uint8 b);
-    bool Game_Font_WriteCentered(struct Game_Font *gf, SDL_Renderer *r, int x, int y);
-    bool Game_Font_Write(struct Game_Font *gf, SDL_Renderer *r, SDL_Rect *dest);
-    void Game_Font_Destroy(struct Game_Font *gf);
+    struct GameEngine_Font {
+        struct GameEngine_Font_Data *data;
+
+        struct GameEngine_Font *(*setText)(struct GameEngine_Font *, char *);
+        struct GameEngine_Font *(*setTextInt)(struct GameEngine_Font *, int);
+        struct GameEngine_Font *(*setColour)(struct GameEngine_Font *, Uint8, Uint8, Uint8);
+        struct GameEngine_Font *(*writeCentered)(struct GameEngine_Font *, int, int);
+        struct GameEngine_Font *(*write)(struct GameEngine_Font *, SDL_Rect *);
+        struct GameEngine_Font *(*setRenderer)(struct GameEngine_Font *, SDL_Renderer *);
+    };
+
+    struct GameEngine_Font *GameEngine_Font_Init(SDL_Renderer *, char *, int);
+
+#define GameEngine_Font_Destroy(...) GameEngine_Font_DestroyBase((struct GameEngine_Font *[]){__VA_ARGS__, NULL});
+    void GameEngine_Font_DestroyBase(struct GameEngine_Font **);
 
 #ifdef __cplusplus
 }
