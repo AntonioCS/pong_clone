@@ -3,7 +3,8 @@
 #include <stdlib.h>
 #include <stdbool.h>
 #include <unistd.h>
-#include "dbg.h"
+#include "GameEngine/Font/Font.h"
+#include "GameEngine/dbg.h"
 
 #ifndef PONG_PRIVATE_H
 #define PONG_PRIVATE_H
@@ -42,12 +43,14 @@ extern "C" {
 
         unsigned int p1_score;
         unsigned int p2_score;
+
+        SDL_Renderer *r;
     };
 
     struct Pong_Data *p_data;
 
-    struct Game_Font *gf_p1_score;
-    struct Game_Font *gf_p2_score;
+    struct GameEngine_Font *p1Score;
+    struct GameEngine_Font *p2Score;
 
     static int ball_speed = 2;
     static int player_speed = 10;
@@ -95,6 +98,9 @@ extern "C" {
     static void handle_scores(struct Pong_Data *pd, enum Ball_State);
     static void calculate_defaults(struct Pong_Data *pd);
     static int inline get_percentage_value(int value, int percentage);
+    static int getPlayer1Score();
+    static int getPlayer2Score();
+    static SDL_Renderer *getRenderer();
 
     struct Pong_Window *init_window(const int window_x, const int window_y, const int window_height, const int window_width) {
         //http://stackoverflow.com/questions/9691404/how-to-initialize-const-in-a-struct-in-c-with-malloc
@@ -315,6 +321,18 @@ error:
 
     int get_percentage_value(int value, int percentage) {
         return (float) value * (float) percentage / 100;
+    }
+
+    int getPlayer1Score() {
+        return p_data->p1_score;
+    }
+
+    int getPlayer2Score() {
+        return p_data->p2_score;
+    }
+
+    static SDL_Renderer *getRenderer() {
+        return p_data->r;
     }
 
 #ifdef __cplusplus

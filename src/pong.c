@@ -1,5 +1,4 @@
 #include "pong.h"
-#include "fonts.h"
 #include "pong_private.h"
 
 void Pong_Init(const int start_x, const int start_y, const int window_height, const int window_width) {
@@ -17,8 +16,9 @@ void Pong_Init(const int start_x, const int start_y, const int window_height, co
     p_data->p2_score = 0;
 
     char *pong_score_font_path = "./resources/font/press-start/prstart.ttf";
-    gf_p1_score = Game_Font_Init(pong_score_font_path, default_font_score_size);
-    gf_p2_score = Game_Font_Init(pong_score_font_path, default_font_score_size);
+
+    p1Score = GameEngine_Font_Init(NULL, pong_score_font_path, default_font_score_size);
+    p2Score = GameEngine_Font_Init(NULL, pong_score_font_path, default_font_score_size);
 }
 
 void Pong_Handle(const Uint8 *keys) {
@@ -28,25 +28,34 @@ void Pong_Handle(const Uint8 *keys) {
     handle_scores(p_data, bstate);
 }
 
-void Pong_Draw(SDL_Renderer *gRenderer) {
-    Game_Font_SetTextInt(gf_p1_score, p_data->p1_score);
-    Game_Font_SetTextInt(gf_p2_score, p_data->p2_score);
+void Pong_SetRenderer(SDL_Renderer *r) {
+    p_data->r = r;
 
+    p1Score->setRenderer(p1Score, r);
+    p2Score->setRenderer(p2Score, r);
+}
+
+void Pong_Draw() {
     //Clear screen
-    SDL_SetRenderDrawColor(gRenderer, 255, 255, 255, 0xFF);
-    SDL_RenderClear(gRenderer);
+    SDL_SetRenderDrawColor(getRenderer(), 255, 255, 255, 0xFF);
+    SDL_RenderClear(getRenderer());
+
+    p1Score
+            ->setTextInt(p1Score, getPlayer1Score())
+            ->writeCentered(p1Score, center_half_left, default_font_margin_top_space)
+            ;
+    p2Score
+            ->setTextInt(p2Score, getPlayer2Score())
+            ->writeCentered(p2Score, center_half_right, default_font_margin_top_space)
+            ;
 
     //Draw Players
-    SDL_SetRenderDrawColor(gRenderer, 0, 0, 0, 0xFF);
-    SDL_RenderDrawRect(gRenderer, p_data->player1);
-    SDL_RenderDrawRect(gRenderer, p_data->player2);
+    SDL_SetRenderDrawColor(getRenderer(), 0, 0, 0, 0xFF);
+    SDL_RenderDrawRect(getRenderer(), p_data->player1);
+    SDL_RenderDrawRect(getRenderer(), p_data->player2);
 
     //Draw "ball"
-    SDL_RenderDrawRect(gRenderer, &(p_data->ball->coords));
-
-    //Draw Text
-    Game_Font_WriteCentered(gf_p1_score, gRenderer, center_half_left, default_font_margin_top_space);
-    Game_Font_WriteCentered(gf_p2_score, gRenderer, center_half_right, default_font_margin_top_space);
+    SDL_RenderDrawRect(getRenderer(), &(p_data->ball->coords));
 
     //Debug lines
     /*
@@ -70,11 +79,7 @@ void Pong_Destroy() {
     free(p_data->player2);
     p_data->player2 = NULL;
 
-    Game_Font_Destroy(gf_p1_score);
-    gf_p1_score = NULL;
-
-    Game_Font_Destroy(gf_p2_score);
-    gf_p2_score = NULL;
+    GameEngine_Font_Destroy(&p1Score, &p2Score);
 
     free(p_data);
     p_data = NULL;

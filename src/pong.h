@@ -10,10 +10,12 @@ extern "C" {
 #include <stdlib.h>
 #include <stdbool.h>
 #include <string.h>
+#include "GameEngine/Font/Font.h"
 
     void Pong_Init(const int start_x, const int start_y, const int window_height, const int window_width);
     void Pong_Handle(const Uint8 *);
-    void Pong_Draw(SDL_Renderer *gRenderer);
+    void Pong_SetRenderer(SDL_Renderer *);
+    void Pong_Draw();
     void Pong_Destroy();
 
 #ifdef __cplusplus
