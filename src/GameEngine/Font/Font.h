@@ -6,7 +6,6 @@
 #include <SDL_ttf.h>
 #include <stdlib.h>
 #include <stdio.h>
-#include <string.h>
 #include <stdbool.h>
 #include <string.h> //strcmp
 #include "../dbg.h"
