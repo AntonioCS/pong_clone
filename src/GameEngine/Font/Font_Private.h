@@ -1,6 +1,7 @@
 
 #ifndef FONT_PRIVATE_H
 #define FONT_PRIVATE_H
+
 #include "Font.h"
 
 #ifdef __cplusplus
@@ -18,9 +19,11 @@ extern "C" {
         unsigned int size;
 
         SDL_Renderer *renderer;
+        SDL_Texture *lastTextureTxt;
+        bool useLastTexture;
     };
 
-    static SDL_Colour *default_colour() {
+    static SDL_Colour *default_colour(void) {
         SDL_Colour *c = malloc(sizeof (SDL_Colour));
 
         c->r = 0;
@@ -30,18 +33,31 @@ extern "C" {
         return c;
     }
 
-    static void check_for_allocated_text(struct GameEngine_Font_Data *data) {
+    static void destroy_last_texture(struct GameEngine_Font_Data *data) {
+        if (data->lastTextureTxt) {
+            SDL_DestroyTexture(data->lastTextureTxt);
+            data->lastTextureTxt = NULL;
+        }
+        data->useLastTexture = false;
+    }
+
+    static void destroy_allocated_text(struct GameEngine_Font_Data *data) {
         if (data->text_allocated && data->text) {
             free(data->text);
-
             data->text = NULL;
             data->text_allocated = false;
         }
     }
 
-    static struct GameEngine_Font *setTextInt(struct GameEngine_Font *self, int num) {
-        check_for_allocated_text(self->data);
+    static void check_for_previous_text_match(struct GameEngine_Font_Data *data, char *text) {
+        if (data->text != NULL && data->lastTextureTxt != NULL && strcmp(data->text, text) == 0) {
+            data->useLastTexture = true;
+        } else {
+            destroy_last_texture(data);
+        }
+    }
 
+    static struct GameEngine_Font *setTextInt(struct GameEngine_Font *self, int num) {
         //http://stackoverflow.com/a/8257728/8715 - Check in comments
         int length = snprintf(NULL, 0, "%d", num) + 1;
         char *text = calloc(length, sizeof (char));
@@ -49,6 +65,10 @@ extern "C" {
 
         snprintf(text, length, "%d", num);
 
+        check_for_previous_text_match(self->data, text);
+
+        //NOTE: This needs to be called only after check_for_previous_text_match
+        destroy_allocated_text(self->data);
         self->data->text = text;
         self->data->text_allocated = true;
 
@@ -58,7 +78,8 @@ error:
     }
 
     static struct GameEngine_Font *setText(struct GameEngine_Font *self, char *text) {
-        check_for_allocated_text(self->data);
+        check_for_previous_text_match(self->data, text);
+        destroy_allocated_text(self->data);
         self->data->text = text;
 
         return self;
@@ -97,20 +118,26 @@ error:
     static struct GameEngine_Font *write(struct GameEngine_Font *self, SDL_Rect *dest) {
         check(self->data->font, "Font has not been initialized");
 
-        SDL_Surface *surfaceTxt = TTF_RenderText_Solid(self->data->font, self->data->text, *(self->data->colour));
-        check(surfaceTxt, "TTF_RenderText failed: %s", TTF_GetError());
+        if (!self->data->useLastTexture || self->data->lastTextureTxt == NULL) {
+            log_info("Creating new text texture");
+            destroy_last_texture(self->data);
 
-        SDL_Texture *textureTxt = SDL_CreateTextureFromSurface(self->data->renderer, surfaceTxt);
-        SDL_FreeSurface(surfaceTxt);
-        check(textureTxt, "SDL_CreateTextureFromSurface failed: %s", SDL_GetError());
+            SDL_Surface *surfaceTxt = TTF_RenderText_Solid(self->data->font, self->data->text, *(self->data->colour));
+            check(surfaceTxt, "TTF_RenderText failed: %s", TTF_GetError());
 
-        int res = SDL_RenderCopy(self->data->renderer, textureTxt, NULL, dest);
-        SDL_DestroyTexture(textureTxt);
+            self->data->lastTextureTxt = SDL_CreateTextureFromSurface(self->data->renderer, surfaceTxt);
+            self->data->useLastTexture = true;
+            SDL_FreeSurface(surfaceTxt);
+            check(self->data->lastTextureTxt, "SDL_CreateTextureFromSurface failed: %s", SDL_GetError());
+        }
+
+        int res = SDL_RenderCopy(self->data->renderer, self->data->lastTextureTxt, NULL, dest);
         check(res == 0, "SDL_RenderCopy failed: %s", SDL_GetError());
 
         return self;
 
 error:
+        destroy_last_texture(self->data);
         return NULL;
     }
 
@@ -127,7 +154,8 @@ error:
             free(self->data->colour);
             self->data->colour = NULL;
 
-            check_for_allocated_text(self->data);
+            destroy_allocated_text(self->data);
+            destroy_last_texture(self->data);
 
             free(self->data);
             self->data = NULL;

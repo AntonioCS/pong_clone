@@ -18,6 +18,9 @@ struct GameEngine_Font *GameEngine_Font_Init(SDL_Renderer *r, char *fpath, int s
     data->text_allocated = false;
     data->renderer = r;
 
+    data->useLastTexture = false;
+    data->lastTextureTxt = NULL;
+
     self->data = data;
 
     self->setText = setText;
