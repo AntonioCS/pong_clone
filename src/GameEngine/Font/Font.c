@@ -21,14 +21,20 @@ struct GameEngine_Font *GameEngine_Font_Init(SDL_Renderer *r, char *fpath, int s
     data->useLastTexture = false;
     data->lastTextureTxt = NULL;
 
+    data->width = 0;
+    data->height = 0;
+
     self->data = data;
 
+    //Methods
     self->setText = setText;
     self->setTextInt = setTextInt;
     self->write = write;
     self->writeCentered = writeCentered;
     self->setColour = setColour;
     self->setRenderer = setRenderer;
+    self->getHeight = getHeight;
+    self->getWidth = getWidth;
 
     return self;
 
