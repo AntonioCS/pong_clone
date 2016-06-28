@@ -21,6 +21,9 @@ extern "C" {
         SDL_Renderer *renderer;
         SDL_Texture *lastTextureTxt;
         bool useLastTexture;
+
+        int width;
+        int height;
     };
 
     static SDL_Colour *default_colour(void) {
@@ -57,6 +60,10 @@ extern "C" {
         }
     }
 
+    static void calculate_text_widht_height(struct GameEngine_Font_Data *data) {
+        TTF_SizeText(data->font, data->text, &(data->width), &(data->height));
+    }
+
     static struct GameEngine_Font *setTextInt(struct GameEngine_Font *self, int num) {
         //http://stackoverflow.com/a/8257728/8715 - Check in comments
         int length = snprintf(NULL, 0, "%d", num) + 1;
@@ -72,6 +79,8 @@ extern "C" {
         self->data->text = text;
         self->data->text_allocated = true;
 
+        calculate_text_widht_height(self->data);
+
         return self;
 error:
         return NULL;
@@ -80,39 +89,36 @@ error:
     static struct GameEngine_Font *setText(struct GameEngine_Font *self, char *text) {
         check_for_previous_text_match(self->data, text);
         destroy_allocated_text(self->data);
+
         self->data->text = text;
+
+        calculate_text_widht_height(self->data);
 
         return self;
     }
 
     static struct GameEngine_Font *setColour(struct GameEngine_Font *self, Uint8 r, Uint8 g, Uint8 b) {
-        self->data->colour->r = r;
-        self->data->colour->g = g;
-        self->data->colour->b = b;
+
+        if (self->data->colour->r != r || self->data->colour->g != g || self->data->colour->b != b) {
+            destroy_last_texture(self->data);
+
+            self->data->colour->r = r;
+            self->data->colour->g = g;
+            self->data->colour->b = b;
+        }
 
         return self;
     }
 
     static struct GameEngine_Font *writeCentered(struct GameEngine_Font *self, int x, int y) {
-        int w;
-        int h;
-
-        check(TTF_SizeText(self->data->font, self->data->text, &w, &h) == 0, "TTF error: %s", TTF_GetError());
-
-        x -= w / 2;
-        y -= h / 2;
-
         SDL_Rect coords = {
-            .x = x,
-            .y = y,
-            .w = w,
-            .h = h
+            .x = (x - self->data->width / 2),
+            .y = (y - self->data->height / 2),
+            .w = self->data->width,
+            .h = self->data->height
         };
 
         return self->write(self, &coords);
-
-error:
-        return NULL;
     }
 
     static struct GameEngine_Font *write(struct GameEngine_Font *self, SDL_Rect *dest) {
@@ -164,6 +170,13 @@ error:
         }
     }
 
+    static int getWidth(struct GameEngine_Font *self) {
+        return self->data->width;
+    }
+
+    static int getHeight(struct GameEngine_Font *self) {
+        return self->data->height;
+    }
 
 #ifdef __cplusplus
 }
