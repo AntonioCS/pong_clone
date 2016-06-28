@@ -2,8 +2,8 @@
 #ifndef FONTS_H
 #define FONTS_H
 
-#include <SDL.h>
-#include <SDL_ttf.h>
+#include <SDL2/SDL.h>
+#include <SDL2/SDL_ttf.h>
 #include <stdlib.h>
 #include <stdio.h>
 #include <stdbool.h>
@@ -25,6 +25,8 @@ extern "C" {
         struct GameEngine_Font *(*writeCentered)(struct GameEngine_Font *, int, int);
         struct GameEngine_Font *(*write)(struct GameEngine_Font *, SDL_Rect *);
         struct GameEngine_Font *(*setRenderer)(struct GameEngine_Font *, SDL_Renderer *);
+        int (*getWidth)(struct GameEngine_Font *);
+        int (*getHeight)(struct GameEngine_Font *);
     };
 
     struct GameEngine_Font *GameEngine_Font_Init(SDL_Renderer *, char *, int);
