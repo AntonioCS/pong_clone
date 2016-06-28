@@ -4,7 +4,7 @@ OBJ_DIR=./obj
 TARGET=$(BUILD_DIR)/$(BIN)
 CFLAGS=-std=c11 -Wall -Werror -g -O0
 LDFLAGS=
-LDLIBS=`pkg-config --libs --cflags sdl2 SDL2_ttf`
+LDLIBS=`pkg-config --libs --cflags sdl2 SDL2_ttf SDL2_image`
 CC=gcc
 SRC_DIR=./src
 SRC=$(shell find $(SRC_DIR) -name '*.c')
