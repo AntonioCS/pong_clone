@@ -1,16 +1,16 @@
 #ifndef PONG_H
 #define PONG_H
 
-#ifdef __cplusplus
-extern "C" {
-#endif
-
-#include <SDL.h>
+#include <SDL2/SDL.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdbool.h>
 #include <string.h>
 #include "GameEngine/Font/Font.h"
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 
     void Pong_Init(const int start_x, const int start_y, const int window_height, const int window_width);
     void Pong_Handle(const Uint8 *);
