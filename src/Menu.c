@@ -49,12 +49,13 @@ static Menu_Item **create_menu_items(SDL_Renderer *r, void **menu_items, int tot
     return items;
 }
 
-Menu_Container *Menu_Init(SDL_Renderer *r, void *items[]) {
+Menu_Container *Menu_InitBase(SDL_Renderer *r, void *items[], void *data) {
     Menu_Container *mc = malloc(sizeof (Menu_Container));
     int total = count_items(items);
 
     mc->items = create_menu_items(r, items, total);
     mc->total = total / 2;
+    mc->data = data;
     mc->r = r;
 
     return mc;
@@ -87,7 +88,7 @@ static void trigger_selected(Menu_Container *mc) {
     for (int i = 0; i < mc->total; i++) {
         if (mc->items[i]->selected) {
             Menu_ItemAction action = mc->items[i]->action;
-            action(NULL);
+            action(mc->data);
             
             break;
         }
@@ -133,6 +134,8 @@ void Menu_Display(Menu_Container *mc, int x, int y) {
     }
 }
 
+
+//@todo Finish this in case I need to add menus dynamically
 void Menu_ItemAdd(Menu_Container *mc, char *name, Menu_ItemAction action) {
     if (mc->items == NULL) {
 
