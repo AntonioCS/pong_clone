@@ -7,10 +7,27 @@
 #include "pong.h"
 #include "Menu.h"
 
+enum game_screen {
+    menu,
+    game
+};
+
+struct game_state {
+    bool quit;
+    enum game_screen screen;
+} gstate = {
+    .quit = false,
+    .screen = menu
+};
+
+#define CAST_TO_GSTATE(data) struct game_state *gstate = (struct game_state *)data;
 
 void menu_item_new_game(void *data) {
     log_info("New game selected");
+    CAST_TO_GSTATE(data);
 
+    Pong_Reset();
+    gstate->screen = game;
 }
 
 void menu_item_settings(void *data) {
@@ -19,18 +36,18 @@ void menu_item_settings(void *data) {
 
 void menu_item_quit(void *data) {
     log_info("Quit selected");
+    CAST_TO_GSTATE(data);
+
+    gstate->quit = true;
 }
 
-enum game_screen {
-    menu,
-    game
-};
+
 
 void *menu_items[] = {
-  "New Game", menu_item_new_game,
-  "Settings", menu_item_settings,
-  "Quit", menu_item_quit,
-  NULL
+    "New Game", menu_item_new_game,
+    "Settings", menu_item_settings,
+    "Quit", menu_item_quit,
+    NULL
 };
 
 int main(int argc, char* args[]) {
@@ -40,7 +57,6 @@ int main(int argc, char* args[]) {
 
     SDL_Window* window = NULL;
     int img_flags = IMG_INIT_JPG | IMG_INIT_PNG;
-    enum game_screen screen = menu;
     //enum game_screen screen = game;
 
     //Initialize SDL
@@ -48,44 +64,43 @@ int main(int argc, char* args[]) {
         SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "1");
         window = SDL_CreateWindow("Pong", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, SCREEN_WIDTH, SCREEN_HEIGHT, SDL_WINDOW_SHOWN);
         SDL_Renderer *gRenderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
-        bool quit = false;
         bool paused = false;
         SDL_Event e;
 
-        Pong_Init(0, 0, SCREEN_HEIGHT, SCREEN_WIDTH);
+        Pong_Init(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
         Pong_SetRenderer(gRenderer);
 
-        Menu_Container *main_menu = Menu_Init(gRenderer, menu_items); //screen);
+        Menu_Container *main_menu = Menu_Init(gRenderer, menu_items, &gstate);
 
         //GameEngine_Font *menu_names = GameEngine_Font_Init(gRenderer, "./resources/font/press-start/prstart.ttf", 20);
         const Uint8 *keys = NULL;
 
-        while (!quit) {
+        while (!gstate.quit) {
             while (SDL_PollEvent(&e) != 0) {
                 //User requests quit
                 if (e.type == SDL_QUIT) {
-                    quit = true;
+                    gstate.quit = true;
                 }
                 if (e.type == SDL_KEYDOWN) {
                     switch (e.key.keysym.sym) {
                         case SDLK_ESCAPE:
-                            quit = true;
+                            gstate.screen = (gstate.screen == menu ? game : menu);
+                            //quit = true;
                             break;
                         case SDLK_p:
                             paused = !paused;
                             break;
-                        case SDLK_a:
-                            screen = (screen == menu ? game : menu);
-                            break;
                         default:
-                            Menu_Handle(main_menu, e.key.keysym.sym);
+                            if (gstate.screen == menu) {
+                                Menu_Handle(main_menu, e.key.keysym.sym);
+                            }
                     }
                 }
             }
 
             keys = SDL_GetKeyboardState(NULL);
             //*/
-            switch (screen) {
+            switch (gstate.screen) {
                 case menu:
                     //Clear screen
                     SDL_SetRenderDrawColor(gRenderer, 255, 255, 255, 0xFF);
