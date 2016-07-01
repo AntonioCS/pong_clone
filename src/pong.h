@@ -17,6 +17,7 @@ extern "C" {
     void Pong_SetRenderer(SDL_Renderer *);
     void Pong_Draw();
     void Pong_Destroy();
+    void Pong_Reset();
 
 #ifdef __cplusplus
 }
