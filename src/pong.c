@@ -1,7 +1,7 @@
 #include "pong.h"
 #include "pong_private.h"
 
-void Pong_Init(const int start_x, const int start_y, const int window_height, const int window_width) {
+void Pong_Init(const int start_x, const int start_y, const int window_width, const int window_height) {
     p_data = malloc(sizeof (struct Pong_Data));
 
     p_data->window = init_window(start_x, start_y, window_height, window_width);
@@ -19,6 +19,20 @@ void Pong_Init(const int start_x, const int start_y, const int window_height, co
 
     p1Score = GameEngine_Font_Init(NULL, pong_score_font_path, default_font_score_size);
     p2Score = GameEngine_Font_Init(NULL, pong_score_font_path, default_font_score_size);
+}
+
+void Pong_Reset() {
+    //backup data
+    const int x = p_data->window->x;
+    const int y = p_data->window->y;
+    const int w = p_data->window->w;
+    const int h = p_data->window->h;
+    SDL_Renderer *r = p_data->r;
+
+    Pong_Destroy();
+
+    Pong_Init(x,y,w,h);
+    Pong_SetRenderer(r);
 }
 
 void Pong_Handle(const Uint8 *keys) {
