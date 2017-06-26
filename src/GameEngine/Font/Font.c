@@ -2,9 +2,11 @@
 #include "Font_Private.h"
 
 struct GameEngine_Font *GameEngine_Font_Init(SDL_Renderer *r, char *fpath, int size) {
+    struct GameEngine_Font *self;
+
     check(TTF_WasInit(), "TTF has not been initialized");
 
-    struct GameEngine_Font *self = malloc(sizeof (*self));
+    self = malloc(sizeof (*self));
     check_mem(self);
 
     struct GameEngine_Font_Data *data = malloc(sizeof (*data));
