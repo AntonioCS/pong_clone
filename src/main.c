@@ -61,6 +61,7 @@ int main(int argc, char* args[]) {
 
     //Initialize SDL
     if (SDL_Init(SDL_INIT_VIDEO) == 0 && TTF_Init() == 0 && (IMG_Init(img_flags) & img_flags) == img_flags) {
+        //https://wiki.libsdl.org/SDL_HINT_RENDER_SCALE_QUALITY?highlight=%28%5CbCategoryDefine%5Cb%29%7C%28CategoryHints%29
         SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "1");
         window = SDL_CreateWindow("Pong", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, SCREEN_WIDTH, SCREEN_HEIGHT, SDL_WINDOW_SHOWN);
         SDL_Renderer *gRenderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
